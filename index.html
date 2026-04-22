@@ -381,38 +381,38 @@ const WORKER_URL = 'YOUR_WORKER_URL_HERE';
 const TESTERS = {
   "Shandey (All Scenarios)": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808817",
-    companyLabel: "Full Review · All 9 In-Scope Scenarios",
-    scenarios: ["1A", "1B", "2A", "2B", "2C", "4A", "4B", "E3", "E5"]
+    companyLabel: "Full Review · All 7 In-Scope Scenarios",
+    scenarios: ["1A", "2A", "2B", "4A", "N1", "N2", "N3"]
   },
   "Melanie Rome": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808817",
     companyLabel: "CA · 7756341741808817",
-    scenarios: ["1A", "1B", "2A", "2B", "2C", "4A", "4B", "E3", "E5"]
+    scenarios: ["1A", "2A", "2B", "4A", "N1", "N2", "N3"]
   },
   "Elena Bishop": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808851",
     companyLabel: "CA · 7756341741808851",
-    scenarios: ["1A", "1B", "2A", "2B", "2C", "4A", "4B", "E3", "E5"]
+    scenarios: ["1A", "2A", "2B", "4A", "N1", "N2", "N3"]
   },
   "Elliot Judware": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808824",
     companyLabel: "CO · 7756341741808824",
-    scenarios: ["1A", "1B", "2A", "2B", "2C", "4A", "4B", "E3", "E5"]
+    scenarios: ["1A", "2A", "2B", "4A", "N1", "N2", "N3"]
   },
   "Claudia Tadla": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808828",
     companyLabel: "FL · 7756341741808828",
-    scenarios: ["1A", "1B", "2A", "2B", "2C", "4A", "4B", "E3", "E5"]
+    scenarios: ["1A", "2A", "2B", "4A", "N1", "N2", "N3"]
   },
   "Megan Swan": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808829",
     companyLabel: "TX · 7756341741808829",
-    scenarios: ["1A", "1B", "4A", "4B"]
+    scenarios: ["1A", "4A"]
   },
   "Alan White": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808834",
     companyLabel: "MI · 7756341741808834",
-    scenarios: ["1A", "1B", "4A", "4B"]
+    scenarios: ["1A", "4A"]
   },
   "Angie Rolon": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808836",
@@ -427,17 +427,17 @@ const TESTERS = {
   "Isabel Tejada": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808843",
     companyLabel: "NY · 7756341741808843",
-    scenarios: ["2C"]
+    scenarios: ["N1"]
   },
   "Chris Weitzel": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808847",
     companyLabel: "GA · 7756341741808847",
-    scenarios: ["E3"]
+    scenarios: ["N2"]
   },
   "Greg Fleming": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808849",
     companyLabel: "IL · 7756341741808849",
-    scenarios: ["E5"]
+    scenarios: ["N3"]
   },
   "Wes Su": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808825",
@@ -461,17 +461,26 @@ const SCENARIOS = {
     role: "Admin",
     desc: "Confirm underwritten MHP plans and configure the benefits package.",
     steps: "1) Log in and navigate to the PEO benefits installation flow. 2) Review the list of eligible MHP plans returned from underwriting. 3) Confirm plan selection and proceed to configuration.",
-    observe: "Can admin distinguish available from unavailable plans? Is underwriting data (rates, plan details) accurate? Is there a clear CTA to confirm vs. go back?",
+    observe: "Can admin distinguish available from unavailable plans? Is underwriting data (rates, plan details) accurate? Is there a clear CTA to confirm vs. go back? Are PEO policy effective and expiration dates non-editable? Are voluntary lidi plans absent from recommendations? Do medical plans show no metal tier?",
     success: "Admin can confirm plan selection without Sales Rep intervention."
   },
-  "1B": {
-    title: "Contribution and waiting period configuration",
+  "N1": {
+    title: "PEO/SGHI channel enforcement",
     category: "Plan Selection & Benefits Customization",
     role: "Admin",
-    desc: "Set employer/employee contribution splits and waiting periods.",
-    steps: "1) Configure employer contribution. 2) Attempt to set contribution below underwriting minimum. 3) Correct the contribution and set a waiting period. 4) Save configuration.",
-    observe: "Is the minimum enforced with a clear error? Does the system show real-time cost impact? Are waiting period options clearly labeled?",
-    success: "Guardrails prevent non-compliant contribution inputs; admin can complete config without errors."
+    desc: "Verify it is impossible to add SGHI plans to a PEO NPA and that all recommended plans are from a single purchasing channel.",
+    steps: "1) Attempt to add an SGHI plan to the PEO NPA. 2) Review all recommended plans to confirm they are PEO-only. 3) Verify PEO and SGHI policies cannot be added to the same open enrollment window.",
+    observe: "Is the add-SGHI action blocked with a clear error? Are all recommended plans consistently labeled as PEO? Is there any UI path that allows mixing channels?",
+    success: "SGHI plans cannot be added to a PEO NPA; all recommendations are PEO-only."
+  },
+  "N2": {
+    title: "Plan filtering & risk band validation",
+    category: "Plan Selection & Benefits Customization",
+    role: "Admin",
+    desc: "Validate that plans are correctly filtered by state/county availability and that missing risk bands prevent plan recommendations.",
+    steps: "1) Log in with the HI company (state not supported) and attempt plan selection. 2) Log in with the AL company (county not supported) and attempt plan selection. 3) For a supported-state company, observe risk band behavior and what happens when they're absent. 4) Verify an unsupported line of coverage (e.g. STD in CA) is filtered out.",
+    observe: "Is the state/county restriction clearly communicated? Are blocked plans absent or shown with a reason? If risk bands are missing for a carrier/effective date, are those plans excluded?",
+    success: "Plans are correctly filtered; testers can understand why specific plans are or aren't recommended."
   },
   "2A": {
     title: "Eligibility review before OE launch",
@@ -488,53 +497,26 @@ const SCENARIOS = {
     role: "Admin",
     desc: "Select and launch an Open Enrollment period.",
     steps: "1) Select an OE start and end date. 2) System validates the window against plan effective dates. 3) Preview the employee communication. 4) Launch OE.",
-    observe: "Are OE date constraints clearly communicated? Is the notification preview accurate? Is the launch action gated behind all prior steps?",
-    success: "OE launched correctly with no date-related compliance errors."
-  },
-  "2C": {
-    title: "Participation threshold enforcement",
-    category: "Employee Eligibility & Open Enrollment",
-    role: "Admin / Operator",
-    desc: "Understand what happens when participation minimums are not met.",
-    steps: "1) OE closes below the required threshold. 2) Admin receives a notification and attempts to proceed. 3) System blocks progression to carrier implementation. 4) Operator manually reviews.",
-    observe: "Is the block clearly explained (why, threshold, what's needed)? Can admin self-serve or is operator intervention the only path? Is the operator review workflow defined?",
-    success: "Admin understands the block and knows the next step; system does not silently fail."
+    observe: "Are OE date constraints clearly communicated? Is the notification preview accurate? Is the launch action gated behind all prior steps? Can PEO and SGHI policies be added to the same OE window (they should not be)?",
+    success: "OE launched correctly with no date-related compliance errors; PEO/SGHI mixing is blocked."
   },
   "4A": {
     title: "Sales Rep builds and edits the benefits package",
-    category: "Sales Rep & Operator Workflows",
+    category: "Sales Rep Workflows",
     role: "PEO Sales Rep",
     desc: "Configure a benefits package prior to admin confirmation.",
     steps: "1) Open the benefits setup view for a qualified customer. 2) Build a plan package (plans, contributions, waiting periods). 3) Make edits based on customer feedback. 4) Hand off to admin for confirmation.",
     observe: "Can Sales Rep edit without triggering admin notifications? Is the handoff from Sales Rep to admin clear in the UI? Are Sales Rep and admin views appropriately scoped?",
     success: "Sales Rep can prepare and iterate on a package before the admin reviews it."
   },
-  "4B": {
-    title: "Resetting the benefits install state",
-    category: "Sales Rep & Operator Workflows",
-    role: "Operator",
-    desc: "Clear a customer's install state and allow re-entry into SGHI shopping.",
-    steps: "1) Identify a customer who needs to restart the install. 2) Clear the current benefits install state. 3) Confirm the customer is routed back to the SGHI shopping experience.",
-    observe: "Is the reset action surfaced only to operators (not admins)? Does the reset cleanly remove all prior config (no orphaned policies or OE records)? Is the new entry path clearly presented?",
-    success: "Operator can reset cleanly; no data corruption or broken state."
-  },
-  "E3": {
-    title: "Sales Rep edits after admin has begun confirmation",
-    category: "Edge Cases & Stress Tests",
-    role: "Sales Rep / Admin",
-    desc: "Validate edit locking or merge conflict behavior when both parties are active simultaneously.",
-    steps: "1) Admin opens the confirmation flow. 2) Sales Rep makes an edit to the package concurrently. 3) Observe system behavior — does it lock, warn, or allow?",
-    observe: "Is admin notified of the change? Is Sales Rep blocked or warned before editing? Does the system handle the conflict without data loss?",
-    success: "No silent data conflicts; both parties are informed of the concurrent edit situation."
-  },
-  "E5": {
-    title: "OE launch attempted before all forms are signed",
-    category: "Edge Cases & Stress Tests",
+  "N3": {
+    title: "Hawaiian Ice in-app experience",
+    category: "Hawaiian Ice — In-App Experience",
     role: "Admin",
-    desc: "Validate OE launch is gated behind form completion.",
-    steps: "1) Navigate to OE setup before completing form signing. 2) Attempt to launch OE.",
-    observe: "Is the OE launch action disabled or does it surface an error on click? Is the unsigned form clearly identified with a link back to the signing step? Is the error actionable?",
-    success: "Progression is gated; clear error surfaced with a path to resolution."
+    desc: "Validate the PEO-specific in-app (Hawaiian Ice) experience matches all expected behaviors from the deck.",
+    steps: "1) Navigate through the full NPA creation flow in-app. 2) Check plan display, support routing, and onboarding questions. 3) Attempt to filter plans by metal tier. 4) Trigger a support call and verify routing.",
+    observe: "Do medical plans show no metal tier and cannot be filtered by metal tier? Is voluntary lidi absent from selectable options? Do support calls route to the correct team via Chilipiper? Is the admin NOT asked about business establishment date, secretary of state status, or S-corp status? If the company is taxable as S-corp, is the owner premiums question still present?",
+    success: "All in-app behaviors match Hawaiian Ice expectations; no SGHI-era UI elements or questions appear."
   }
 };
 
