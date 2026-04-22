@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PEO NPA Testfest — Feedback</title>
+  <style>
+    :root {
+      --kale:        #0A8080;
+      --kale-dark:   #076464;
+      --kale-mid:    #14A0A0;
+      --kale-light:  #E6F4F4;
+      --guava:       #F45D48;
+      --guava-light: #FFF0EE;
+      --sage:        #2D9A6E;
+      --bg:          #F5F2ED;
+      --card:        #FFFFFF;
+      --border:      #E3DDD6;
+      --border-dark: #C9C3BB;
+      --text:        #1C1917;
+      --text-2:      #44403C;
+      --text-3:      #78716C;
+      --pass:        #16A34A;
+      --pass-bg:     #F0FDF4;
+      --pass-border: #86EFAC;
+      --fail:        #DC2626;
+      --fail-bg:     #FEF2F2;
+      --fail-border: #FECACA;
+      --blocked:     #D97706;
+      --blocked-bg:  #FFFBEB;
+      --blocked-bdr: #FCD34D;
+      --skipped-bg:  #F8F7F6;
+      --skipped-bdr: #E3DDD6;
+      --r:           10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 64px;
+    }
+
+    /* ── Top hero banner ── */
+    .hero {
+      background: var(--kale);
+      background: linear-gradient(135deg, #076464 0%, #0A8080 45%, #0E9696 100%);
+      color: #fff;
+      padding: 28px 24px 26px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
+    }
+
+    .hero-inner { position: relative; max-width: 580px; margin: 0 auto; }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      margin-bottom: 6px;
+    }
+
+    .hero h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      line-height: 1.15;
+    }
+
+    .hero h1 span { color: rgba(255,255,255,0.65); font-weight: 400; }
+
+    .hero-sub {
+      margin-top: 6px;
+      font-size: 13.5px;
+      opacity: 0.75;
+    }
+
+    .hero-pills {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .hero-pill {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    /* ── Setup warning ── */
+    .setup-warn {
+      max-width: 580px;
+      margin: 16px auto 0;
+      padding: 0 16px;
+      display: none;
+    }
+
+    .setup-warn-inner {
+      background: #FFFBEB;
+      border: 1.5px solid #FCD34D;
+      border-radius: var(--r);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #92400E;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .setup-warn-inner code {
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 11.5px;
+      background: #FEF3C7;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* ── Content wrapper ── */
+    .wrap {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 20px 16px 0;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .card-head {
+      padding: 14px 20px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-head-icon {
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .card-head-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    .card-body { padding: 18px 20px; }
+
+    .card-body + .card-body {
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 5px;
+    }
+
+    label .opt {
+      font-size: 11.5px;
+      font-weight: 400;
+      color: var(--text-3);
+      margin-left: 4px;
+    }
+
+    label .req { color: var(--guava); }
+
+    input[type="text"],
+    input[type="url"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      font-size: 13.5px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      line-height: 1.45;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%2378716C' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 11px center;
+      padding-right: 30px;
+      cursor: pointer;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--kale);
+      box-shadow: 0 0 0 3px rgba(10,128,128,0.13);
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    .helper {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* ── Role tag ── */
+    .role-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .role-tag.admin      { background: #DBEAFE; color: #1D4ED8; }
+    .role-tag.sales      { background: #EDE9FE; color: #6D28D9; }
+    .role-tag.operator   { background: #FEF9C3; color: #92400E; }
+    .role-tag.multi      { background: #E0F2FE; color: #0369A1; }
+
+    /* ── Company select ── */
+    .company-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      padding: 8px 11px;
+      background: var(--kale-light);
+      border-radius: 7px;
+      font-size: 12px;
+      color: var(--kale-dark);
+      font-weight: 500;
+    }
+
+    .company-link a {
+      color: var(--kale);
+      text-decoration: none;
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    .company-link a:hover { text-decoration: underline; }
+
+    /* ── Result grid ── */
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .result-opt { position: relative; cursor: pointer; }
+
+    .result-opt input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .result-lbl {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 13px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.14s, background 0.14s;
+      user-select: none;
+    }
+
+    .result-lbl:hover { border-color: var(--border-dark); }
+
+    .result-em { font-size: 19px; line-height: 1; flex-shrink: 0; }
+
+    .result-copy strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .result-copy small {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .result-opt input[value="✅ Pass"]:checked    ~ .result-lbl { border-color: var(--pass);    background: var(--pass-bg); }
+    .result-opt input[value="❌ Fail"]:checked    ~ .result-lbl { border-color: var(--fail);    background: var(--fail-bg); }
+    .result-opt input[value="🚧 Blocked"]:checked ~ .result-lbl { border-color: var(--blocked); background: var(--blocked-bg); }
+    .result-opt input[value="⏭ Skipped"]:checked  ~ .result-lbl { border-color: var(--border-dark); background: var(--skipped-bg); }
+
+    .result-opt input[value="✅ Pass"]:checked    ~ .result-lbl .result-copy strong { color: var(--pass); }
+    .result-opt input[value="❌ Fail"]:checked    ~ .result-lbl .result-copy strong { color: var(--fail); }
+    .result-opt input[value="🚧 Blocked"]:checked ~ .result-lbl .result-copy strong { color: var(--blocked); }
+
+    /* ── Bug report section ── */
+    .bug-section {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      background: var(--fail-bg);
+      border: 1.5px solid var(--fail-border);
+      border-radius: 8px;
+    }
+
+    .bug-section.blocked {
+      background: var(--blocked-bg);
+      border-color: var(--blocked-bdr);
+    }
+
+    .bug-section.show { display: block; }
+
+    .bug-section-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--fail);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .bug-section.blocked .bug-section-label { color: var(--blocked); }
+
+    /* ── Submit ── */
+    .submit-area { padding: 18px 20px; }
+
+    .btn-submit {
+      width: 100%;
+      padding: 13px 24px;
+      background: var(--kale);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.14s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: -0.1px;
+    }
+
+    .btn-submit:hover:not(:disabled) { background: var(--kale-dark); }
+    .btn-submit:active:not(:disabled) { transform: scale(0.99); }
+    .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn-another {
+      width: 100%;
+      padding: 11px;
+      background: transparent;
+      color: var(--kale);
+      border: 1.5px solid var(--kale);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.14s;
+      display: none;
+    }
+
+    .btn-another:hover { background: var(--kale-light); }
+
+    /* ── Spinner ── */
+    .spin {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: rot 0.65s linear infinite;
+      display: none;
+    }
+    .btn-submit.loading .spin    { display: block; }
+    .btn-submit.loading .btn-txt { display: none; }
+    @keyframes rot { to { transform: rotate(360deg); } }
+
+    /* ── Success banner ── */
+    .success-row {
+      display: none;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 14px 16px;
+      background: var(--pass-bg);
+      border: 1.5px solid var(--pass-border);
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .success-row.show { display: flex; }
+    .success-row-text strong { font-size: 14px; color: var(--pass); display: block; }
+    .success-row-text span   { font-size: 12px; color: #15803D; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(72px);
+      padding: 11px 18px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #fff;
+      background: #1C1917;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+      transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 999;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.ok   { background: #15803D; }
+    .toast.err  { background: #B91C1C; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 20px;
+      padding: 0 16px;
+    }
+    .footer a { color: var(--kale); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-5px); }
+      75%      { transform: translateX(5px); }
+    }
+
+    @media (max-width: 460px) {
+      .hero h1 { font-size: 21px; }
+      .field-row { grid-template-columns: 1fr; }
+      .result-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Gusto PEO</p>
+    <h1>NPA Testfest <span>2026</span></h1>
+    <p class="hero-sub">Log your test result — syncs to Notion automatically</p>
+    <div class="hero-pills">
+      <span class="hero-pill">🗓 Apr 27 – May 8</span>
+      <span class="hero-pill">🧪 14 scenarios</span>
+      <span class="hero-pill">📋 Notion live</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Setup warning (auto-hidden when webhook set) ── -->
+<div class="setup-warn" id="setupWarn">
+  <div class="setup-warn-inner">
+    <span>⚙️</span>
+    <div>
+      <strong>One-time setup:</strong> Replace <code>YOUR_MAKE_WEBHOOK_URL_HERE</code> in the
+      <code>&lt;script&gt;</code> tag at the bottom of this file with your Make.com webhook URL.
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+<form id="form" novalidate>
+
+  <!-- ── 1. Who are you ── -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-head-icon">👤</span>
+      <span class="card-head-label">About you</span>
+    </div>
+    <div class="card-body">
+      <div class="field-row">
+        <div class="field">
+          <label for="tester">Your name <span class="req">*</span></label>
+          <input type="text" id="tester" placeholder="First Last" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="date">Date</label>
+          <input type="date" id="date" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Scenario ── -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-head-icon">🗂</span>
+      <span class="card-head-label">Test scenario</span>
+    </div>
+    <div class="card-body">
+      <div class="field">
+        <label for="scenario">Scenario <span class="req">*</span></label>
+        <select id="scenario" required>
+          <option value="" disabled selected>— Pick a scenario —</option>
+          <optgroup label="Plan Selection &amp; Benefits Customization">
+            <option value="1A — Baseline plan confirmation"                           data-role="Admin">1A — Baseline plan confirmation</option>
+            <option value="1B — Contribution and waiting period configuration"        data-role="Admin">1B — Contribution and waiting period configuration</option>
+          </optgroup>
+          <optgroup label="Employee Eligibility &amp; Open Enrollment">
+            <option value="2A — Eligibility review before OE launch"                 data-role="Admin">2A — Eligibility review before OE launch</option>
+            <option value="2B — Open Enrollment window selection"                    data-role="Admin">2B — Open Enrollment window selection</option>
+            <option value="2C — Participation threshold enforcement"                 data-role="Admin / Operator">2C — Participation threshold enforcement</option>
+          </optgroup>
+          <optgroup label="Sales Rep &amp; Operator Workflows">
+            <option value="4A — Sales Rep builds and edits the benefits package"     data-role="PEO Sales Rep">4A — Sales Rep builds and edits the benefits package</option>
+            <option value="4B — Resetting the benefits install state"                data-role="Operator">4B — Resetting the benefits install state</option>
+            <option value="4C — DTQ or participation failure — manual intervention"  data-role="Operator">4C — DTQ or participation failure — manual intervention</option>
+          </optgroup>
+          <optgroup label="Edge Cases &amp; Stress Tests">
+            <option value="E1 — Zero employee elections at OE close"                 data-role="Admin / Operator">E1 — Zero employee elections at OE close</option>
+            <option value="E2 — Waiting period conflicts with effective date"        data-role="Admin">E2 — Waiting period conflicts with effective date</option>
+            <option value="E3 — Sales Rep edits after admin has begun confirmation"  data-role="Sales Rep / Admin">E3 — Sales Rep edits after admin has begun confirmation</option>
+            <option value="E4 — Two employees in same household / different ZIPs"   data-role="Admin">E4 — Two employees in same household / different ZIPs</option>
+            <option value="E5 — OE launch attempted before all forms are signed"    data-role="Admin">E5 — OE launch attempted before all forms are signed</option>
+            <option value="E7 — Existing SGHI customer re-entering as PEO"          data-role="Admin / Operator">E7 — Existing SGHI customer re-entering as PEO</option>
+          </optgroup>
+        </select>
+        <div id="roleWrap" style="display:none;">
+          <div class="role-tag" id="roleTag"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Company -->
+    <div class="card-body">
+      <div class="field">
+        <label for="company">Demo company <span class="req">*</span></label>
+        <select id="company" required>
+          <option value="" disabled selected>— Select your assigned company —</option>
+          <optgroup label="Happy Path">
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808817">CA · 7756341741808817</option>
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808851">CA · 7756341741808851</option>
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808824">CO · 7756341741808824</option>
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808828">FL · 7756341741808828</option>
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808829">TX · 7756341741808829</option>
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808834">MI · 7756341741808834</option>
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808836">MA · 7756341741808836</option>
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808838">OR · 7756341741808838</option>
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808843">NY · 7756341741808843</option>
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808847">GA · 7756341741808847</option>
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808849">IL · 7756341741808849</option>
+          </optgroup>
+          <optgroup label="Sad Path">
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808825">HI · 7756341741808825 — State not supported</option>
+            <option value="https://app.gusto-demo.com/panda/companies/7756341741808837">AL · 7756341741808837 — County not supported</option>
+          </optgroup>
+          <option value="other">Other / custom company</option>
+        </select>
+        <div id="companyLinkWrap" class="company-link" style="display:none;">
+          🔗 <a id="companyLink" href="#" target="_blank" rel="noopener">Open in Gusto Demo</a>
+        </div>
+        <div class="field" id="customCompanyWrap" style="display:none;margin-top:10px;">
+          <label for="customCompany">Paste company URL</label>
+          <input type="url" id="customCompany" placeholder="https://app.gusto-demo.com/panda/companies/..." />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Result ── -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-head-icon">📊</span>
+      <span class="card-head-label">Result <span class="req" style="font-style:normal;">*</span></span>
+    </div>
+    <div class="card-body">
+      <div class="result-grid">
+        <label class="result-opt">
+          <input type="radio" name="result" value="✅ Pass" />
+          <div class="result-lbl">
+            <span class="result-em">✅</span>
+            <div class="result-copy"><strong>Pass</strong><small>Met success criteria</small></div>
+          </div>
+        </label>
+        <label class="result-opt">
+          <input type="radio" name="result" value="❌ Fail" />
+          <div class="result-lbl">
+            <span class="result-em">❌</span>
+            <div class="result-copy"><strong>Fail</strong><small>Did not meet criteria</small></div>
+          </div>
+        </label>
+        <label class="result-opt">
+          <input type="radio" name="result" value="🚧 Blocked" />
+          <div class="result-lbl">
+            <span class="result-em">🚧</span>
+            <div class="result-copy"><strong>Blocked</strong><small>Needs eng to unblock</small></div>
+          </div>
+        </label>
+        <label class="result-opt">
+          <input type="radio" name="result" value="⏭ Skipped" />
+          <div class="result-lbl">
+            <span class="result-em">⏭</span>
+            <div class="result-copy"><strong>Skipped</strong><small>N/A or out of scope</small></div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Expanded bug report — shown for Fail/Blocked -->
+      <div class="bug-section" id="bugSection">
+        <div class="bug-section-label" id="bugLabel">🐛 Bug report</div>
+        <div class="field">
+          <label for="expectedBehavior">Expected behavior <span class="req">*</span></label>
+          <textarea id="expectedBehavior" rows="2" placeholder="What should have happened…"></textarea>
+        </div>
+        <div class="field">
+          <label for="whatHappened">What actually happened <span class="req">*</span></label>
+          <textarea id="whatHappened" rows="2" placeholder="Describe the actual behavior / error…"></textarea>
+        </div>
+        <div class="field">
+          <label for="screenshotLink">Screenshot or link <span class="opt">(optional)</span></label>
+          <input type="url" id="screenshotLink" placeholder="Figma link, screenshot URL, GitHub issue…" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes — always visible -->
+    <div class="card-body">
+      <div class="field">
+        <label for="notes">Additional notes <span class="opt">(optional)</span></label>
+        <textarea id="notes" rows="2" placeholder="Anything else worth capturing…"></textarea>
+      </div>
+    </div>
+
+    <!-- Success / Submit -->
+    <div class="submit-area">
+      <div class="success-row" id="successRow">
+        <span style="font-size:20px;">🎉</span>
+        <div class="success-row-text">
+          <strong>Logged to Notion!</strong>
+          <span>Your result was added to the Test Results Log. Submit another below.</span>
+        </div>
+      </div>
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <span class="btn-txt">Submit to Notion →</span>
+        <div class="spin"></div>
+      </button>
+      <button type="button" class="btn-another" id="anotherBtn">+ Log another result</button>
+    </div>
+  </div>
+
+</form>
+</div>
+
+<p class="footer">
+  Results → <a href="https://www.notion.so/d5163304b5db4f1f981c65166abc06eb" target="_blank">Testing Execution · Test Results Log</a>
+  &nbsp;·&nbsp; NPA PEO Testfest · Apr 27–May 8, 2026
+</p>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─────────────────────────────────────────────────
+  // SETUP: Replace with your Make.com webhook URL
+  // Make.com → New scenario → Webhooks → Custom webhook
+  // ─────────────────────────────────────────────────
+  const WEBHOOK = 'YOUR_MAKE_WEBHOOK_URL_HERE';
+
+  const isDemo = WEBHOOK === 'YOUR_MAKE_WEBHOOK_URL_HERE';
+  document.getElementById('setupWarn').style.display = isDemo ? 'block' : 'none';
+
+  // Auto-fill today
+  document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+  // ── Role auto-fill ──
+  const scenarioSel = document.getElementById('scenario');
+  const roleWrap    = document.getElementById('roleWrap');
+  const roleTag     = document.getElementById('roleTag');
+  const roleClasses = { Admin:'admin', 'PEO Sales Rep':'sales', Operator:'operator', 'Admin / Operator':'multi', 'Sales Rep / Admin':'multi' };
+  const roleIcons   = { Admin:'🏢', 'PEO Sales Rep':'💼', Operator:'⚙️', 'Admin / Operator':'🏢⚙️', 'Sales Rep / Admin':'💼🏢' };
+
+  scenarioSel.addEventListener('change', () => {
+    const role = scenarioSel.options[scenarioSel.selectedIndex]?.dataset.role || '';
+    if (role) {
+      roleTag.textContent  = (roleIcons[role] || '') + '  ' + role;
+      roleTag.className    = 'role-tag ' + (roleClasses[role] || '');
+      roleWrap.style.display = 'block';
+    } else {
+      roleWrap.style.display = 'none';
+    }
+  });
+
+  // ── Company link preview ──
+  const companySel      = document.getElementById('company');
+  const companyLinkWrap = document.getElementById('companyLinkWrap');
+  const companyLink     = document.getElementById('companyLink');
+  const customWrap      = document.getElementById('customCompanyWrap');
+  const customInput     = document.getElementById('customCompany');
+
+  companySel.addEventListener('change', () => {
+    const val = companySel.value;
+    if (val === 'other') {
+      companyLinkWrap.style.display = 'none';
+      customWrap.style.display      = 'block';
+    } else if (val) {
+      companyLink.href              = val;
+      companyLinkWrap.style.display = 'flex';
+      customWrap.style.display      = 'none';
+    } else {
+      companyLinkWrap.style.display = 'none';
+      customWrap.style.display      = 'none';
+    }
+  });
+
+  // ── Bug section toggle ──
+  const bugSection = document.getElementById('bugSection');
+  const bugLabel   = document.getElementById('bugLabel');
+
+  document.querySelectorAll('input[name="result"]').forEach(r => {
+    r.addEventListener('change', () => {
+      const v = r.value;
+      if (v === '❌ Fail') {
+        bugSection.className   = 'bug-section show';
+        bugLabel.textContent   = '🐛 Bug report';
+      } else if (v === '🚧 Blocked') {
+        bugSection.className   = 'bug-section blocked show';
+        bugLabel.textContent   = '🚧 Blocked — what\'s stopping you?';
+      } else {
+        bugSection.className   = 'bug-section';
+      }
+    });
+  });
+
+  // ── Toast ──
+  const toast = document.getElementById('toast');
+  let toastTmr;
+  function showToast(msg, type = 'ok') {
+    clearTimeout(toastTmr);
+    toast.textContent = (type === 'ok' ? '✓  ' : '✗  ') + msg;
+    toast.className   = 'toast ' + type;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    toastTmr = setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  // ── Submit ──
+  const form       = document.getElementById('form');
+  const submitBtn  = document.getElementById('submitBtn');
+  const anotherBtn = document.getElementById('anotherBtn');
+  const successRow = document.getElementById('successRow');
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const tester   = document.getElementById('tester').value.trim();
+    const date     = document.getElementById('date').value;
+    const scenario = scenarioSel.value;
+    const role     = document.getElementById('roleWrap').style.display !== 'none'
+                       ? roleTag.textContent.replace(/^[^\w]+/, '').trim()
+                       : '';
+    const rawCo    = companySel.value;
+    const company  = rawCo === 'other'
+                       ? customInput.value.trim()
+                       : rawCo;
+    const result   = document.querySelector('input[name="result"]:checked')?.value;
+    const expected = document.getElementById('expectedBehavior').value.trim();
+    const happened = document.getElementById('whatHappened').value.trim();
+    const screenshot = document.getElementById('screenshotLink').value.trim();
+    const notes    = document.getElementById('notes').value.trim();
+
+    if (!tester)   { shake('tester');   showToast('Enter your name', 'err');         return; }
+    if (!scenario) { shake('scenario'); showToast('Select a scenario', 'err');       return; }
+    if (!company)  { shake('company');  showToast('Select a demo company', 'err');   return; }
+    if (!result)   {                    showToast('Select a result', 'err');         return; }
+    if ((result === '❌ Fail' || result === '🚧 Blocked') && !expected) {
+      shake('expectedBehavior');
+      showToast('Describe the expected behavior', 'err');
+      return;
+    }
+    if ((result === '❌ Fail' || result === '🚧 Blocked') && !happened) {
+      shake('whatHappened');
+      showToast('Describe what actually happened', 'err');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+
+    const payload = {
+      date,
+      tester,
+      test_case: scenario,
+      role,
+      company,
+      result,
+      expected_behavior: expected,
+      what_happened: happened,
+      screenshot_link: screenshot,
+      notes
+    };
+
+    try {
+      if (isDemo) {
+        console.log('📋 [Demo mode] Payload that would go to Notion:', payload);
+        await new Promise(r => setTimeout(r, 900));
+      } else {
+        const res = await fetch(WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+      }
+      onSuccess(scenario, result);
+    } catch (err) {
+      console.error(err);
+      showToast('Submission failed — check webhook URL', 'err');
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('loading');
+    }
+  });
+
+  function onSuccess(scenario, result) {
+    submitBtn.classList.remove('loading');
+    submitBtn.style.display  = 'none';
+    successRow.classList.add('show');
+    anotherBtn.style.display = 'block';
+    showToast(scenario.split(' ')[0] + ' logged as ' + result);
+  }
+
+  anotherBtn.addEventListener('click', () => {
+    form.reset();
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+    roleWrap.style.display          = 'none';
+    companyLinkWrap.style.display   = 'none';
+    customWrap.style.display        = 'none';
+    bugSection.className            = 'bug-section';
+    successRow.classList.remove('show');
+    submitBtn.style.display         = 'flex';
+    submitBtn.disabled              = false;
+    anotherBtn.style.display        = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  function shake(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = 'shake 0.3s ease';
+    el.addEventListener('animationend', () => (el.style.animation = ''), { once: true });
+  }
+</script>
+</body>
+</html>
