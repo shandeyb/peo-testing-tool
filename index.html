@@ -381,8 +381,8 @@ const WORKER_URL = 'YOUR_WORKER_URL_HERE';
 const TESTERS = {
   "Shandey (All Scenarios)": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808817",
-    companyLabel: "Full Review · All 14 Scenarios",
-    scenarios: ["1A", "1B", "2A", "2B", "2C", "4A", "4B", "4C", "E1", "E2", "E3", "E4", "E5", "E7"]
+    companyLabel: "Full Review · All 9 In-Scope Scenarios",
+    scenarios: ["1A", "1B", "2A", "2B", "2C", "4A", "4B", "E3", "E5"]
   },
   "Tester 1": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808817",
@@ -397,22 +397,17 @@ const TESTERS = {
   "Tester 3": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808828",
     companyLabel: "FL · 7756341741808828",
-    scenarios: ["4B", "4C", "E1"]
+    scenarios: ["4B", "E3", "E5"]
   },
   "Tester 4": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808829",
     companyLabel: "TX · 7756341741808829",
-    scenarios: ["E2", "E3", "E4"]
+    scenarios: ["2C", "4A", "4B"]
   },
   "Tester 5": {
     company: "https://app.gusto-demo.com/panda/companies/7756341741808834",
     companyLabel: "MI · 7756341741808834",
-    scenarios: ["E5", "E7"]
-  },
-  "Tester 6": {
-    company: "https://app.gusto-demo.com/panda/companies/7756341741808825",
-    companyLabel: "HI · 7756341741808825 (Sad Path — State not supported)",
-    scenarios: ["1A", "E7"]
+    scenarios: ["E3", "E5"]
   }
 };
 
@@ -425,6 +420,8 @@ const SCENARIOS = {
     category: "Plan Selection & Benefits Customization",
     role: "Admin",
     desc: "Confirm underwritten MHP plans and configure the benefits package.",
+    steps: "1) Log in and navigate to the PEO benefits installation flow. 2) Review the list of eligible MHP plans returned from underwriting. 3) Confirm plan selection and proceed to configuration.",
+    observe: "Can admin distinguish available from unavailable plans? Is underwriting data (rates, plan details) accurate? Is there a clear CTA to confirm vs. go back?",
     success: "Admin can confirm plan selection without Sales Rep intervention."
   },
   "1B": {
@@ -432,13 +429,17 @@ const SCENARIOS = {
     category: "Plan Selection & Benefits Customization",
     role: "Admin",
     desc: "Set employer/employee contribution splits and waiting periods.",
-    success: "Guardrails prevent non-compliant contribution inputs; admin completes config without errors."
+    steps: "1) Configure employer contribution. 2) Attempt to set contribution below underwriting minimum. 3) Correct the contribution and set a waiting period. 4) Save configuration.",
+    observe: "Is the minimum enforced with a clear error? Does the system show real-time cost impact? Are waiting period options clearly labeled?",
+    success: "Guardrails prevent non-compliant contribution inputs; admin can complete config without errors."
   },
   "2A": {
     title: "Eligibility review before OE launch",
     category: "Employee Eligibility & Open Enrollment",
     role: "Admin",
     desc: "Review and confirm employee eligibility statuses before launching Open Enrollment.",
+    steps: "1) Navigate to the employee eligibility view. 2) Review statuses (eligible, ineligible, pending). 3) Update a status based on a recent hire. 4) Confirm eligibility list and proceed to OE setup.",
+    observe: "Can admin understand why an employee is ineligible? Is editing a status easy to find? Is the eligible vs. total count clearly visible?",
     success: "Admin can review and confirm eligibility without contacting support."
   },
   "2B": {
@@ -446,6 +447,8 @@ const SCENARIOS = {
     category: "Employee Eligibility & Open Enrollment",
     role: "Admin",
     desc: "Select and launch an Open Enrollment period.",
+    steps: "1) Select an OE start and end date. 2) System validates the window against plan effective dates. 3) Preview the employee communication. 4) Launch OE.",
+    observe: "Are OE date constraints clearly communicated? Is the notification preview accurate? Is the launch action gated behind all prior steps?",
     success: "OE launched correctly with no date-related compliance errors."
   },
   "2C": {
@@ -453,70 +456,45 @@ const SCENARIOS = {
     category: "Employee Eligibility & Open Enrollment",
     role: "Admin / Operator",
     desc: "Understand what happens when participation minimums are not met.",
-    success: "Admin understands the block and knows next step; system does not silently fail."
+    steps: "1) OE closes below the required threshold. 2) Admin receives a notification and attempts to proceed. 3) System blocks progression to carrier implementation. 4) Operator manually reviews.",
+    observe: "Is the block clearly explained (why, threshold, what's needed)? Can admin self-serve or is operator intervention the only path? Is the operator review workflow defined?",
+    success: "Admin understands the block and knows the next step; system does not silently fail."
   },
   "4A": {
     title: "Sales Rep builds and edits the benefits package",
     category: "Sales Rep & Operator Workflows",
     role: "PEO Sales Rep",
     desc: "Configure a benefits package prior to admin confirmation.",
-    success: "Sales Rep can prepare and iterate on a package before admin reviews it."
+    steps: "1) Open the benefits setup view for a qualified customer. 2) Build a plan package (plans, contributions, waiting periods). 3) Make edits based on customer feedback. 4) Hand off to admin for confirmation.",
+    observe: "Can Sales Rep edit without triggering admin notifications? Is the handoff from Sales Rep to admin clear in the UI? Are Sales Rep and admin views appropriately scoped?",
+    success: "Sales Rep can prepare and iterate on a package before the admin reviews it."
   },
   "4B": {
     title: "Resetting the benefits install state",
     category: "Sales Rep & Operator Workflows",
     role: "Operator",
     desc: "Clear a customer's install state and allow re-entry into SGHI shopping.",
+    steps: "1) Identify a customer who needs to restart the install. 2) Clear the current benefits install state. 3) Confirm the customer is routed back to the SGHI shopping experience.",
+    observe: "Is the reset action surfaced only to operators (not admins)? Does the reset cleanly remove all prior config (no orphaned policies or OE records)? Is the new entry path clearly presented?",
     success: "Operator can reset cleanly; no data corruption or broken state."
-  },
-  "4C": {
-    title: "DTQ or participation failure — manual intervention",
-    category: "Sales Rep & Operator Workflows",
-    role: "Operator",
-    desc: "Handle a customer who was declined-to-quote or failed participation thresholds.",
-    success: "Operator can handle the exception end-to-end without engineering support."
-  },
-  "E1": {
-    title: "Zero employee elections at OE close",
-    category: "Edge Cases & Stress Tests",
-    role: "Admin / Operator",
-    desc: "Participation check blocks progression when no elections recorded.",
-    success: "System prevents OE close with a clear error message."
-  },
-  "E2": {
-    title: "Waiting period conflicts with effective date",
-    category: "Edge Cases & Stress Tests",
-    role: "Admin",
-    desc: "System flags or corrects a waiting period incompatible with 1/1/27 effective date.",
-    success: "System flags or corrects the conflict with a clear explanation."
   },
   "E3": {
     title: "Sales Rep edits after admin has begun confirmation",
     category: "Edge Cases & Stress Tests",
     role: "Sales Rep / Admin",
-    desc: "Validate edit locking or merge conflict behavior when both parties are active.",
-    success: "No silent data overwrite; conflict is surfaced clearly to both parties."
-  },
-  "E4": {
-    title: "Two employees in same household / different ZIPs",
-    category: "Edge Cases & Stress Tests",
-    role: "Admin",
-    desc: "Eligibility display handles household ZIP edge case cleanly.",
-    success: "Eligibility is assessed per employee ZIP, not household."
+    desc: "Validate edit locking or merge conflict behavior when both parties are active simultaneously.",
+    steps: "1) Admin opens the confirmation flow. 2) Sales Rep makes an edit to the package concurrently. 3) Observe system behavior — does it lock, warn, or allow?",
+    observe: "Is admin notified of the change? Is Sales Rep blocked or warned before editing? Does the system handle the conflict without data loss?",
+    success: "No silent data conflicts; both parties are informed of the concurrent edit situation."
   },
   "E5": {
     title: "OE launch attempted before all forms are signed",
     category: "Edge Cases & Stress Tests",
     role: "Admin",
-    desc: "OE launch is gated behind form completion.",
-    success: "System blocks OE launch with clear guidance on missing forms."
-  },
-  "E7": {
-    title: "Existing SGHI customer re-entering as PEO",
-    category: "Edge Cases & Stress Tests",
-    role: "Admin / Operator",
-    desc: "No data bleed between SGHI and MHP records for a returning customer.",
-    success: "SGHI records are cleanly separated; no plan/enrollment data bleeds into PEO."
+    desc: "Validate OE launch is gated behind form completion.",
+    steps: "1) Navigate to OE setup before completing form signing. 2) Attempt to launch OE.",
+    observe: "Is the OE launch action disabled or does it surface an error on click? Is the unsigned form clearly identified with a link back to the signing step? Is the error actionable?",
+    success: "Progression is gated; clear error surfaced with a path to resolution."
   }
 };
 
@@ -601,6 +579,12 @@ function makeScenarioCard(id, s) {
     </div>
     <div class="scenario-body" id="body-${id}" style="display:none;">
       <div class="success-criteria">
+        <strong>Goal</strong>
+        ${s.desc}
+      </div>
+      ${s.steps ? `<div class="success-criteria" style="margin-top:8px;"><strong>Steps</strong>${s.steps}</div>` : ''}
+      ${s.observe ? `<div class="success-criteria" style="margin-top:8px;"><strong>What to observe</strong>${s.observe}</div>` : ''}
+      <div class="success-criteria" style="margin-top:8px;">
         <strong>✓ Success criteria</strong>
         ${s.success}
       </div>
